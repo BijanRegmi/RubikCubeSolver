@@ -68,6 +68,9 @@ def solve():
 def selected_colour(c):
     global selected
     selected = c
+    if not mode:
+        show(selected)
+
     
 def edit():
     
