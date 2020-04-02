@@ -1,13 +1,15 @@
 from tkinter import *
 import moves
 import cube
-import kociemba
+import kociemba         #Install this package "pip install kociemba"
+
 cols = ["green","blue","white","yellow","red","orange"]
 Cols = ["g","b","w","y","r","o"]
 selected = 0
-mode = False
 
+#Display the cube face
 def show(side):
+    #Gets surrounding faces
     surr = {
         0:"2435",
         1:"2534",
@@ -16,7 +18,10 @@ def show(side):
         4:"2130",
         5:"2031",
     }.get(side)
+
     side = cols[side]
+
+    #Decides which face is to be shown
     face = {
         cols[0]:cube.green,
         cols[1]:cube.blue,
@@ -25,8 +30,9 @@ def show(side):
         cols[4]:cube.red,
         cols[5]:cube.orange,
     }.get(side)
+    
+    #Place the cubies
     n=0
-
     for i in range(9):
         colour = {
             "g":cols[0],
@@ -36,61 +42,84 @@ def show(side):
             "r":cols[4],
             "o":cols[5],
         }.get(face[int(n/3)][int(n%3)])
+        
         buts[i].config(bg=colour,state="disabled")
-        buts[i].grid(row=int(n/3)+6,column=int(n%3)+4)    #starts from row = 6 and column = 4
+        buts[i].grid(row=int(n/3)+1,column=int(n%3)+1)
         n+=1
-    """ if not mode:
-        msg = "SIDE:"
-        msg+=cols[selected]
-        sel.config(text=msg) """
-    Button(root,width=3,bg=cols[int(surr[0])],state=DISABLED).grid(row=4,column=5)
-    Button(root,width=3,bg=cols[int(surr[1])],state=DISABLED).grid(row=7,column=8)
-    Button(root,width=3,bg=cols[int(surr[2])],state=DISABLED).grid(row=10,column=5)
-    Button(root,width=3,bg=cols[int(surr[3])],state=DISABLED).grid(row=7,column=2)
 
-    Button(root,width=6,text="EDIT",command=edit).grid(row=1,column=1,columnspan=2,rowspan=2)
-    Button(root,width=6,text="SOLVE",command=solve).grid(row=1,column=8,columnspan=2,rowspan=2)
+    #Place the surrounding faces' centers
+    Button(dispcube,width=6,height=3,bg=cols[int(surr[0])],state=DISABLED).grid(row=0,column=2,pady = 40)  #top
+    Button(dispcube,width=6,height=3,bg=cols[int(surr[1])],state=DISABLED).grid(row=2,column=4,padx = 40)  #right
+    Button(dispcube,width=6,height=3,bg=cols[int(surr[2])],state=DISABLED).grid(row=4,column=2,pady = 40)  #bottom
+    Button(dispcube,width=6,height=3,bg=cols[int(surr[3])],state=DISABLED).grid(row=2,column=0,padx = 40)  #left
 
-    
-
-    Button(root,width=3,bg=cols[0],command=lambda:selected_colour(0)).grid(row=1,column=4)
-    Button(root,width=3,bg=cols[1],command=lambda:selected_colour(1)).grid(row=2,column=4)
-    Button(root,width=3,bg=cols[2],command=lambda:selected_colour(2)).grid(row=1,column=5)
-    Button(root,width=3,bg=cols[3],command=lambda:selected_colour(3)).grid(row=2,column=5)
-    Button(root,width=3,bg=cols[4],command=lambda:selected_colour(4)).grid(row=1,column=6)
-    Button(root,width=3,bg=cols[5],command=lambda:selected_colour(5)).grid(row=2,column=6)
-    
+#Solves the current state of cube
 def solve():
-    solution = kociemba.solve(current_state())
-    labe.delete(0,END)
-    labe.insert(0,solution)
+    opt.config(state = "normal")
+    try:
+        solution = kociemba.solve(current_state())
+        opt.delete(0,END)
+        opt.insert(0,solution)
+    except:
+        opt.delete(0,END)
+        opt.insert(0,"INVALID CUBE INPUT")
+    opt.config(state = "readonly")
 
-def selected_colour(c):
-    global selected
-    selected = c
-    if not mode:
-        show(selected)
+#Resets the cube
+def reset():
+    for i in range(3):
+        for j in range(3):
+            cube.green[i][j] = Cols[0]
+    for i in range(3):
+        for j in range(3):
+            cube.blue[i][j] = Cols[1]
+    for i in range(3):
+        for j in range(3):
+            cube.white[i][j] = Cols[2]
+    for i in range(3):
+        for j in range(3):
+            cube.yellow[i][j] = Cols[3]
+    for i in range(3):
+        for j in range(3):
+            cube.red[i][j] = Cols[4]
+    for i in range(3):
+        for j in range(3):
+            cube.orange[i][j] = Cols[5]
+    
+    show(0)
 
-    
-def edit():
-    
-    global mode
-    mode = not mode
-    if mode:
-        buts[0].config(state="normal",command=lambda:edit_colour(0))
-        buts[1].config(state="normal",command=lambda:edit_colour(1))
-        buts[2].config(state="normal",command=lambda:edit_colour(2))
-        buts[3].config(state="normal",command=lambda:edit_colour(3))
-        buts[5].config(state="normal",command=lambda:edit_colour(5))
-        buts[6].config(state="normal",command=lambda:edit_colour(6))
-        buts[7].config(state="normal",command=lambda:edit_colour(7))
-        buts[8].config(state="normal",command=lambda:edit_colour(8))
-        md.config(text="Mode:EDIT SIDE")
-    else:
-        md.config(text="Mode:BROWSE SIDE")
+#Browse mode
+def browse():
+    if not mode.get():
         for i in buts:
             i.config(state="disabled")
+    for i in selectors:
+        i.config(text = "")
 
+#Activates the selected colour
+def selected_colour(c):
+    browse()
+    global selected
+    selected = c
+    if not mode.get():
+        show(selected)
+    else:
+        selectors[c].config(text = "~")
+
+
+#Edit mode for a face
+def edit():
+    buts[0].config(state="normal",command=lambda:edit_colour(0))
+    buts[1].config(state="normal",command=lambda:edit_colour(1))
+    buts[2].config(state="normal",command=lambda:edit_colour(2))
+    buts[3].config(state="normal",command=lambda:edit_colour(3))
+    buts[5].config(state="normal",command=lambda:edit_colour(5))
+    buts[6].config(state="normal",command=lambda:edit_colour(6))
+    buts[7].config(state="normal",command=lambda:edit_colour(7))
+    buts[8].config(state="normal",command=lambda:edit_colour(8))
+    
+
+#Change the colour of the clicked cubie
 def edit_colour(i):
     cur = buts[4].cget('bg')
     face = {
@@ -105,6 +134,7 @@ def edit_colour(i):
     buts[i].config(bg=cols[selected])
 
 
+#Read current state of the cube
 def current_state():
     state = ""
     for i in cube.white:
@@ -126,7 +156,8 @@ def current_state():
         for j in i:
             state+=selecttext(j)
     return state
-            
+
+#Convert to kociemba format      
 def selecttext(c):
     f = {
         "w":"U",
@@ -140,26 +171,71 @@ def selecttext(c):
 
 root = Tk()
 root.title("RUBIK CUBE SOLVER")
+
+#DEFINING FRAMES
+title = LabelFrame(root,padx = 300)
+dispcube = LabelFrame(root,padx = 10,pady = 15,text = "Current State Of Cube")
+modeSel = LabelFrame(root,padx = 60, pady = 10, text = "Select Mode")
+colourSel = LabelFrame(root,padx = 35,pady = 10,text = "Pick A Colour")
+options = LabelFrame(root,text = "Options",padx = 80,pady = 10)
+output = LabelFrame(root,padx = 2, pady = 2,text = "Solution")
+
+#PLACING FRAMES
+title.grid(row = 0, column = 0, columnspan=2,padx = 10,pady = 10)
+dispcube.grid(row = 1, column = 0, rowspan = 3,padx = 10)
+modeSel.grid(row = 1, column = 1,padx = 10)
+colourSel.grid(row = 2, column = 1,padx = 10,pady = 5)
+options.grid(row = 3, column = 1,padx = 10)
+output.grid(row = 4, column = 0,padx = 10,pady = 10)
+
+#TITLE
+Label(title,text = "RUBIK CUBE SOLVER",pady = 3).grid(row = 0, column = 0)
+
+#MODE SELECTOR
+mode = IntVar()
+Radiobutton(modeSel, text = "Browse Sides", variable = mode, value = 0,command = browse).pack(anchor = W)
+Radiobutton(modeSel, text = "Edit Side", variable = mode, value = 1,command = edit).pack(anchor = W)
+
+#COLOUR SELECTOR
+selectors = [
+    Button(colourSel,width=6,height=2,bg=cols[0],command=lambda:selected_colour(0)),
+    Button(colourSel,width=6,height=2,bg=cols[1],command=lambda:selected_colour(1)),
+    Button(colourSel,width=6,height=2,bg=cols[2],command=lambda:selected_colour(2)),
+    Button(colourSel,width=6,height=2,bg=cols[3],command=lambda:selected_colour(3)),
+    Button(colourSel,width=6,height=2,bg=cols[4],command=lambda:selected_colour(4)),
+    Button(colourSel,width=6,height=2,bg=cols[5],command=lambda:selected_colour(5)),
+]
+selectors[0].grid(row=0,column=0,padx=5,pady=2)
+selectors[1].grid(row=0,column=1,padx=5,pady=2)
+selectors[2].grid(row=1,column=0,padx=5,pady=2)
+selectors[3].grid(row=1,column=1,padx=5,pady=2)
+selectors[4].grid(row=2,column=0,padx=5,pady=2)
+selectors[5].grid(row=2,column=1,padx=5,pady=2)
+
+
+#OPTIONS
+Button(options,width=10,text="RESET CUBE",command=reset).grid(row=0,column=0)
+Button(options,width=17,text="GENERATE SOLUTION",command=solve).grid(row=1,column=0)
+
+#OUTPUT
+opt = Entry(output,width=69,state = "readonly")
+opt.grid(row = 0, column = 0)
+
+#EXIT
+ex = Button(root,text = "EXIT",command = root.destroy)
+ex.grid(row = 4, column = 1,padx = 10,pady = 10,sticky = W+E)
+
+#CUBIES
 buts = [
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3),
-        Button(root,width=3)
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3),
+        Button(dispcube,width=6,height=3)
     ]
-md = Label(root,text="Mode:BROWSE SIDES")
-md.grid(row=0,column=0,columnspan=11)
-sel = Label(root)
-sel.grid(row=3,column=0,columnspan=11)
-Label(root).grid(row=5,column=0,columnspan=11)
-Label(root).grid(row=9,column=0,columnspan=11)
-Label(root).grid(row=11,column=0,columnspan=11)
-Label(root).grid(row=13,column=0,columnspan=11)
-labe = Entry(root,width=40)
-labe.grid(row=12,column=0,columnspan=11)
 show(0)
 root.mainloop()
