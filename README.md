@@ -2,6 +2,8 @@
 
 A python program to solve 3x3 rubik cube using 2-Phase algorithm.
 
+Watch [this](https://www.youtube.com/watch?v=CWmKHcx1X6A) video showing the program.
+
 ## Installation
 
 Clone the repository
