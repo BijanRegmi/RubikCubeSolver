@@ -1,1 +1,5 @@
-kociemba==1.2.1
+# Rubik/main.py: 4
+kociemba == 1.2.1
+
+# Rubik/cube.py: 1
+numpy == 1.17.4
