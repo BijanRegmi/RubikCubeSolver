@@ -44,7 +44,7 @@ def show(side):
         }.get(face[int(n/3)][int(n%3)])
         
         buts[i].config(bg=colour,state="disabled")
-        buts[i].grid(row=int(n/3)+1,column=int(n%3)+1)
+        buts[i].grid(row=int(n/3),column=int(n%3),padx=2,pady=2)
         n+=1
 
     #Place the surrounding faces' centers
@@ -56,10 +56,14 @@ def show(side):
 #Solves the current state of cube
 def solve():
     opt.config(state = "normal")
+    solved = "R L U2 R L' B2 U2 R2 F2 L2 D2 L2 F2"
     try:
         solution = kociemba.solve(current_state())
         opt.delete(0,END)
-        opt.insert(0,solution)
+        if solution == solved:
+            opt.insert(0,"Cube already solved")
+        else:
+            opt.insert(0,solution)
     except:
         opt.delete(0,END)
         opt.insert(0,"INVALID CUBE INPUT")
@@ -218,24 +222,28 @@ Button(options,width=10,text="RESET CUBE",command=reset).grid(row=0,column=0)
 Button(options,width=17,text="GENERATE SOLUTION",command=solve).grid(row=1,column=0)
 
 #OUTPUT
-opt = Entry(output,width=69,state = "readonly")
+opt = Entry(output,width=71,state = "readonly")
 opt.grid(row = 0, column = 0)
 
 #EXIT
 ex = Button(root,text = "EXIT",command = root.destroy)
 ex.grid(row = 4, column = 1,padx = 10,pady = 10,sticky = W+E)
 
+#Cube Holder
+holder = LabelFrame(dispcube,bg="black")
+holder.grid(row = 1,column = 1, rowspan = 3, columnspan = 3)
+
 #CUBIES
 buts = [
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3),
-        Button(dispcube,width=6,height=3)
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3),
+        Button(holder,width=6,height=3)
     ]
 show(0)
 root.mainloop()
