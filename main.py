@@ -90,7 +90,7 @@ def reset():
         for j in range(3):
             cube.orange[i][j] = Cols[5]
     
-    show(0)
+    show(selected)
 
 #Browse mode
 def browse():
@@ -181,16 +181,18 @@ title = LabelFrame(root,padx = 300)
 dispcube = LabelFrame(root,padx = 10,pady = 15,text = "Current State Of Cube")
 modeSel = LabelFrame(root,padx = 60, pady = 10, text = "Select Mode")
 colourSel = LabelFrame(root,padx = 35,pady = 10,text = "Pick A Colour")
+scramble = LabelFrame(root,text = "Scramble(Green Front White Top)")
 options = LabelFrame(root,text = "Options",padx = 80,pady = 10)
-output = LabelFrame(root,padx = 2, pady = 2,text = "Solution")
+output = LabelFrame(root,padx = 2, pady = 2,text = "Solution(Green Front White Top)")
 
 #PLACING FRAMES
 title.grid(row = 0, column = 0, columnspan=2,padx = 10,pady = 10)
-dispcube.grid(row = 1, column = 0, rowspan = 3,padx = 10)
+dispcube.grid(row = 1, column = 0, rowspan = 4,padx = 10)
 modeSel.grid(row = 1, column = 1,padx = 10)
 colourSel.grid(row = 2, column = 1,padx = 10,pady = 5)
-options.grid(row = 3, column = 1,padx = 10)
-output.grid(row = 4, column = 0,padx = 10,pady = 10)
+scramble.grid(row = 3, column = 1)
+options.grid(row = 4, column = 1,padx = 10)
+output.grid(row = 5, column = 0,padx = 10,pady = 10)
 
 #TITLE
 Label(title,text = "RUBIK CUBE SOLVER",pady = 3).grid(row = 0, column = 0)
@@ -216,6 +218,26 @@ selectors[3].grid(row=1,column=1,padx=5,pady=2)
 selectors[4].grid(row=2,column=0,padx=5,pady=2)
 selectors[5].grid(row=2,column=1,padx=5,pady=2)
 
+#SCRAMBLER
+Button(scramble,width=2,text = "R",command=lambda: [moves.R(),show(selected)]).grid(row = 0, column = 0)
+Button(scramble,width=2,text = "L",command=lambda: [moves.L(),show(selected)]).grid(row = 0, column = 1)
+Button(scramble,width=2,text = "F",command=lambda: [moves.F(),show(selected)]).grid(row = 0, column = 2)
+Button(scramble,width=2,text = "B",command=lambda: [moves.B(),show(selected)]).grid(row = 0, column = 3)
+Button(scramble,width=2,text = "U",command=lambda: [moves.U(),show(selected)]).grid(row = 0, column = 4)
+Button(scramble,width=2,text = "D",command=lambda: [moves.D(),show(selected)]).grid(row = 0, column = 5)
+Button(scramble,width=2,text = "R'",command=lambda: [moves.r(),show(selected)]).grid(row = 1, column = 0)
+Button(scramble,width=2,text = "L'",command=lambda: [moves.l(),show(selected)]).grid(row = 1, column = 1)
+Button(scramble,width=2,text = "F'",command=lambda: [moves.f(),show(selected)]).grid(row = 1, column = 2)
+Button(scramble,width=2,text = "B'",command=lambda: [moves.b(),show(selected)]).grid(row = 1, column = 3)
+Button(scramble,width=2,text = "U'",command=lambda: [moves.u(),show(selected)]).grid(row = 1, column = 4)
+Button(scramble,width=2,text = "D'",command=lambda: [moves.d(),show(selected)]).grid(row = 1, column = 5)
+Button(scramble,width=2,text = "R2",command=lambda: [moves.R2(),show(selected)]).grid(row = 2, column = 0)
+Button(scramble,width=2,text = "L2",command=lambda: [moves.L2(),show(selected)]).grid(row = 2, column = 1)
+Button(scramble,width=2,text = "F2",command=lambda: [moves.F2(),show(selected)]).grid(row = 2, column = 2)
+Button(scramble,width=2,text = "B2",command=lambda: [moves.B2(),show(selected)]).grid(row = 2, column = 3)
+Button(scramble,width=2,text = "U2",command=lambda: [moves.U2(),show(selected)]).grid(row = 2, column = 4)
+Button(scramble,width=2,text = "D2",command=lambda: [moves.D2(),show(selected)]).grid(row = 2, column = 5)
+
 
 #OPTIONS
 Button(options,width=10,text="RESET CUBE",command=reset).grid(row=0,column=0)
@@ -227,7 +249,7 @@ opt.grid(row = 0, column = 0)
 
 #EXIT
 ex = Button(root,text = "EXIT",command = root.destroy)
-ex.grid(row = 4, column = 1,padx = 10,pady = 10,sticky = W+E)
+ex.grid(row = 5, column = 1,padx = 10,pady = 10,sticky = W+E)
 
 #Cube Holder
 holder = LabelFrame(dispcube,bg="black")
@@ -245,5 +267,5 @@ buts = [
         Button(holder,width=6,height=3),
         Button(holder,width=6,height=3)
     ]
-show(0)
+show(selected)
 root.mainloop()
