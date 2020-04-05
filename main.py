@@ -3,9 +3,6 @@ import moves
 import cube
 import kociemba         #Install this package "pip install kociemba"
 
-cols = ["green","blue","white","yellow","red","orange"]
-Cols = ["g","b","w","y","r","o"]
-selected = 0
 
 #Display the cube face
 def show(side):
@@ -17,7 +14,7 @@ def show(side):
         3:"0415",
         4:"2130",
         5:"2031",
-    }.get(side)
+    }.get(side,dispcube)
 
     side = cols[side]
 
@@ -54,7 +51,7 @@ def show(side):
     Button(dispcube,width=6,height=3,bg=cols[int(surr[3])],state=DISABLED).grid(row=2,column=0,padx = 40)  #left
 
 #Solves the current state of cube
-def solve():
+def solve(opt):
     opt.config(state = "normal")
     solved = "R L U2 R L' B2 U2 R2 F2 L2 D2 L2 F2"
     try:
@@ -70,7 +67,10 @@ def solve():
     opt.config(state = "readonly")
 
 #Resets the cube
-def reset():
+def reset(opt,mode):
+    opt.config(state = "normal")
+    opt.delete(0,END)
+    opt.config(state = "readonly")
     for i in range(3):
         for j in range(3):
             cube.green[i][j] = Cols[0]
@@ -89,11 +89,14 @@ def reset():
     for i in range(3):
         for j in range(3):
             cube.orange[i][j] = Cols[5]
-    
-    show(selected)
+    if not mode.get():
+        show(0)
+    else:
+        show(0)
+        edit()
 
 #Browse mode
-def browse():
+def browse(mode):
     if not mode.get():
         for i in buts:
             i.config(state="disabled")
@@ -101,8 +104,8 @@ def browse():
         i.config(text = "")
 
 #Activates the selected colour
-def selected_colour(c):
-    browse()
+def selected_colour(mode,c):
+    browse(mode)
     global selected
     selected = c
     if not mode.get():
@@ -173,99 +176,106 @@ def selecttext(c):
     }.get(c)
     return f
 
-root = Tk()
-root.title("RUBIK CUBE SOLVER")
+def main(root):
+    global cols,Cols,selected,buts,selectors,dispcube
+    cols = ["green","blue","white","yellow","red","orange"]
+    Cols = ["g","b","w","y","r","o"]
+    selected = 0
 
-#DEFINING FRAMES
-title = LabelFrame(root,padx = 300)
-dispcube = LabelFrame(root,padx = 10,pady = 15,text = "Current State Of Cube")
-modeSel = LabelFrame(root,padx = 60, pady = 10, text = "Select Mode")
-colourSel = LabelFrame(root,padx = 35,pady = 10,text = "Pick A Colour")
-scramble = LabelFrame(root,text = "Scramble(Green Front White Top)")
-options = LabelFrame(root,text = "Options",padx = 80,pady = 10)
-output = LabelFrame(root,padx = 2, pady = 2,text = "Solution(Green Front White Top)")
+    #DEFINING FRAMES
+    title = LabelFrame(root,padx = 300)
+    dispcube = LabelFrame(root,padx = 10,pady = 15,text = "Current State Of Cube")
+    modeSel = LabelFrame(root,padx = 60, pady = 10, text = "Select Mode")
+    colourSel = LabelFrame(root,padx = 35,pady = 10,text = "Pick A Colour")
+    scramble = LabelFrame(root,text = "Scramble(Green Front White Top)")
+    options = LabelFrame(root,text = "Options",padx = 80,pady = 10)
+    output = LabelFrame(root,padx = 2, pady = 2,text = "Solution(Green Front White Top)")
 
-#PLACING FRAMES
-title.grid(row = 0, column = 0, columnspan=2,padx = 10,pady = 10)
-dispcube.grid(row = 1, column = 0, rowspan = 4,padx = 10)
-modeSel.grid(row = 1, column = 1,padx = 10)
-colourSel.grid(row = 2, column = 1,padx = 10,pady = 5)
-scramble.grid(row = 3, column = 1)
-options.grid(row = 4, column = 1,padx = 10)
-output.grid(row = 5, column = 0,padx = 10,pady = 10)
+    #PLACING FRAMES
+    title.grid(row = 0, column = 0, columnspan=2,padx = 10,pady = 10)
+    dispcube.grid(row = 1, column = 0, rowspan = 4,padx = 10)
+    modeSel.grid(row = 1, column = 1,padx = 10)
+    colourSel.grid(row = 2, column = 1,padx = 10,pady = 5)
+    scramble.grid(row = 3, column = 1)
+    options.grid(row = 4, column = 1,padx = 10)
+    output.grid(row = 5, column = 0,padx = 10,pady = 10)
 
-#TITLE
-Label(title,text = "RUBIK CUBE SOLVER",pady = 3).grid(row = 0, column = 0)
+    #TITLE
+    Label(title,text = "RUBIK CUBE SOLVER",pady = 3).grid(row = 0, column = 0)
 
-#MODE SELECTOR
-mode = IntVar()
-Radiobutton(modeSel, text = "Browse Sides", variable = mode, value = 0,command = browse).pack(anchor = W)
-Radiobutton(modeSel, text = "Edit Side", variable = mode, value = 1,command = edit).pack(anchor = W)
+    #MODE SELECTOR
+    mode = IntVar()
+    Radiobutton(modeSel, text = "Browse Sides", variable = mode, value = 0,command = lambda:browse(mode)).pack(anchor = W)
+    Radiobutton(modeSel, text = "Edit Side", variable = mode, value = 1,command = edit).pack(anchor = W)
 
-#COLOUR SELECTOR
-selectors = [
-    Button(colourSel,width=6,height=2,bg=cols[0],command=lambda:selected_colour(0)),
-    Button(colourSel,width=6,height=2,bg=cols[1],command=lambda:selected_colour(1)),
-    Button(colourSel,width=6,height=2,bg=cols[2],command=lambda:selected_colour(2)),
-    Button(colourSel,width=6,height=2,bg=cols[3],command=lambda:selected_colour(3)),
-    Button(colourSel,width=6,height=2,bg=cols[4],command=lambda:selected_colour(4)),
-    Button(colourSel,width=6,height=2,bg=cols[5],command=lambda:selected_colour(5)),
-]
-selectors[0].grid(row=0,column=0,padx=5,pady=2)
-selectors[1].grid(row=0,column=1,padx=5,pady=2)
-selectors[2].grid(row=1,column=0,padx=5,pady=2)
-selectors[3].grid(row=1,column=1,padx=5,pady=2)
-selectors[4].grid(row=2,column=0,padx=5,pady=2)
-selectors[5].grid(row=2,column=1,padx=5,pady=2)
-
-#SCRAMBLER
-Button(scramble,width=2,text = "R",command=lambda: [moves.R(),show(selected)]).grid(row = 0, column = 0)
-Button(scramble,width=2,text = "L",command=lambda: [moves.L(),show(selected)]).grid(row = 0, column = 1)
-Button(scramble,width=2,text = "F",command=lambda: [moves.F(),show(selected)]).grid(row = 0, column = 2)
-Button(scramble,width=2,text = "B",command=lambda: [moves.B(),show(selected)]).grid(row = 0, column = 3)
-Button(scramble,width=2,text = "U",command=lambda: [moves.U(),show(selected)]).grid(row = 0, column = 4)
-Button(scramble,width=2,text = "D",command=lambda: [moves.D(),show(selected)]).grid(row = 0, column = 5)
-Button(scramble,width=2,text = "R'",command=lambda: [moves.r(),show(selected)]).grid(row = 1, column = 0)
-Button(scramble,width=2,text = "L'",command=lambda: [moves.l(),show(selected)]).grid(row = 1, column = 1)
-Button(scramble,width=2,text = "F'",command=lambda: [moves.f(),show(selected)]).grid(row = 1, column = 2)
-Button(scramble,width=2,text = "B'",command=lambda: [moves.b(),show(selected)]).grid(row = 1, column = 3)
-Button(scramble,width=2,text = "U'",command=lambda: [moves.u(),show(selected)]).grid(row = 1, column = 4)
-Button(scramble,width=2,text = "D'",command=lambda: [moves.d(),show(selected)]).grid(row = 1, column = 5)
-Button(scramble,width=2,text = "R2",command=lambda: [moves.R2(),show(selected)]).grid(row = 2, column = 0)
-Button(scramble,width=2,text = "L2",command=lambda: [moves.L2(),show(selected)]).grid(row = 2, column = 1)
-Button(scramble,width=2,text = "F2",command=lambda: [moves.F2(),show(selected)]).grid(row = 2, column = 2)
-Button(scramble,width=2,text = "B2",command=lambda: [moves.B2(),show(selected)]).grid(row = 2, column = 3)
-Button(scramble,width=2,text = "U2",command=lambda: [moves.U2(),show(selected)]).grid(row = 2, column = 4)
-Button(scramble,width=2,text = "D2",command=lambda: [moves.D2(),show(selected)]).grid(row = 2, column = 5)
-
-
-#OPTIONS
-Button(options,width=10,text="RESET CUBE",command=reset).grid(row=0,column=0)
-Button(options,width=17,text="GENERATE SOLUTION",command=solve).grid(row=1,column=0)
-
-#OUTPUT
-opt = Entry(output,width=71,state = "readonly")
-opt.grid(row = 0, column = 0)
-
-#EXIT
-ex = Button(root,text = "EXIT",command = root.destroy)
-ex.grid(row = 5, column = 1,padx = 10,pady = 10,sticky = W+E)
-
-#Cube Holder
-holder = LabelFrame(dispcube,bg="black")
-holder.grid(row = 1,column = 1, rowspan = 3, columnspan = 3)
-
-#CUBIES
-buts = [
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3),
-        Button(holder,width=6,height=3)
+    #COLOUR SELECTOR
+    selectors = [
+        Button(colourSel,width=6,height=2,bg=cols[0],command=lambda:selected_colour(mode,0)),
+        Button(colourSel,width=6,height=2,bg=cols[1],command=lambda:selected_colour(mode,1)),
+        Button(colourSel,width=6,height=2,bg=cols[2],command=lambda:selected_colour(mode,2)),
+        Button(colourSel,width=6,height=2,bg=cols[3],command=lambda:selected_colour(mode,3)),
+        Button(colourSel,width=6,height=2,bg=cols[4],command=lambda:selected_colour(mode,4)),
+        Button(colourSel,width=6,height=2,bg=cols[5],command=lambda:selected_colour(mode,5)),
     ]
-show(selected)
-root.mainloop()
+    selectors[0].grid(row=0,column=0,padx=5,pady=2)
+    selectors[1].grid(row=0,column=1,padx=5,pady=2)
+    selectors[2].grid(row=1,column=0,padx=5,pady=2)
+    selectors[3].grid(row=1,column=1,padx=5,pady=2)
+    selectors[4].grid(row=2,column=0,padx=5,pady=2)
+    selectors[5].grid(row=2,column=1,padx=5,pady=2)
+
+    #SCRAMBLER
+    Button(scramble,width=2,text = "R",command=lambda: [moves.R(),show(selected)]).grid(row = 0, column = 0)
+    Button(scramble,width=2,text = "L",command=lambda: [moves.L(),show(selected)]).grid(row = 0, column = 1)
+    Button(scramble,width=2,text = "F",command=lambda: [moves.F(),show(selected)]).grid(row = 0, column = 2)
+    Button(scramble,width=2,text = "B",command=lambda: [moves.B(),show(selected)]).grid(row = 0, column = 3)
+    Button(scramble,width=2,text = "U",command=lambda: [moves.U(),show(selected)]).grid(row = 0, column = 4)
+    Button(scramble,width=2,text = "D",command=lambda: [moves.D(),show(selected)]).grid(row = 0, column = 5)
+    Button(scramble,width=2,text = "R'",command=lambda: [moves.r(),show(selected)]).grid(row = 1, column = 0)
+    Button(scramble,width=2,text = "L'",command=lambda: [moves.l(),show(selected)]).grid(row = 1, column = 1)
+    Button(scramble,width=2,text = "F'",command=lambda: [moves.f(),show(selected)]).grid(row = 1, column = 2)
+    Button(scramble,width=2,text = "B'",command=lambda: [moves.b(),show(selected)]).grid(row = 1, column = 3)
+    Button(scramble,width=2,text = "U'",command=lambda: [moves.u(),show(selected)]).grid(row = 1, column = 4)
+    Button(scramble,width=2,text = "D'",command=lambda: [moves.d(),show(selected)]).grid(row = 1, column = 5)
+    Button(scramble,width=2,text = "R2",command=lambda: [moves.R2(),show(selected)]).grid(row = 2, column = 0)
+    Button(scramble,width=2,text = "L2",command=lambda: [moves.L2(),show(selected)]).grid(row = 2, column = 1)
+    Button(scramble,width=2,text = "F2",command=lambda: [moves.F2(),show(selected)]).grid(row = 2, column = 2)
+    Button(scramble,width=2,text = "B2",command=lambda: [moves.B2(),show(selected)]).grid(row = 2, column = 3)
+    Button(scramble,width=2,text = "U2",command=lambda: [moves.U2(),show(selected)]).grid(row = 2, column = 4)
+    Button(scramble,width=2,text = "D2",command=lambda: [moves.D2(),show(selected)]).grid(row = 2, column = 5)
+
+
+    #OPTIONS
+    Button(options,width=10,text="RESET CUBE",command=lambda:reset(opt,mode)).grid(row=0,column=0)
+    Button(options,width=17,text="GENERATE SOLUTION",command=lambda:solve(opt)).grid(row=1,column=0)
+
+    #OUTPUT
+    opt = Entry(output,width=71,state = "readonly")
+    opt.grid(row = 0, column = 0)
+
+    #EXIT
+    ex = Button(root,text = "EXIT",command = root.destroy)
+    ex.grid(row = 5, column = 1,padx = 10,pady = 10,sticky = W+E)
+
+    #Cube Holder
+    holder = LabelFrame(dispcube,bg="black")
+    holder.grid(row = 1,column = 1, rowspan = 3, columnspan = 3)
+
+    #CUBIES
+    buts = [
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3),
+            Button(holder,width=6,height=3)
+        ]
+    show(selected)
+
+if __name__ == "__main__":
+    root = Tk()
+    main(root)
+    root.mainloop()
